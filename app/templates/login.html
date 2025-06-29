@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block page_content %}
+
+<style>
+  .form-container {
+    max-width: 400px;
+    margin: 60px auto;
+    padding: 30px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  .title {
+    font-weight: bold;
+    font-size: 28px;
+    color: #e94e77;
+  }
+  .subtitle {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  .btn-custom {
+    background-color: #f2648c;
+    color: white;
+  }
+  .btn-custom:hover {
+    background-color: #e94e77;
+  }
+</style>
+
+<div class="text-center mt-4">
+  <div class="title">SkillEx</div>
+  <div class="subtitle">Exchange skills, grow together</div>
+</div>
+
+<div class="form-container shadow-sm">
+  <h6 class="mb-3 fw-semibold">Welcome back</h6>
+  <p class="text-muted" style="font-size: 14px;">Log in to your account to continue</p>
+  <form method="POST" action="{{ url_for('login') }}">
+    <div class="mb-3">
+      <label for="username" class="form-label">Username</label>
+      <input type="text" name="username" id="username" class="form-control" placeholder="your username" required>
+    </div>
+    <div class="mb-4">
+      <label for="password" class="form-label">Password</label>
+      <input type="password" name="password" id="password" class="form-control" placeholder="Enter your password" required>
+    </div>
+    <button type="submit" class="btn btn-custom w-100">Log in</button>
+  </form>
+  <p class="text-center mt-3" style="font-size: 14px;">
+    Don't have an account? <a href="{{ url_for('register') }}">Create one</a>
+  </p>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Schedule Session | SkillEx{% endblock %}
+{% block page_content %}
+<div class="container mt-5">
+  <h2 class="fw-bold text-danger mb-4">📆 Schedule Learning Session with {{ target_user.username }}</h2>
+
+  <form method="POST" class="bg-white p-4 rounded shadow-sm">
+    <div class="mb-3">
+      <label for="skill" class="form-label fw-semibold">Skill to Learn</label>
+      <input type="text" id="skill" name="skill" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="objectives" class="form-label fw-semibold">Learning Objectives</label>
+      <textarea id="objectives" name="objectives" class="form-control" rows="3" required></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label for="start_time" class="form-label fw-semibold">Date and Time</label>
+      <input type="datetime-local" id="start_time" name="start_time" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="duration" class="form-label fw-semibold">Duration (in minutes)</label>
+      <input type="number" id="duration" name="duration" class="form-control" required min="15" step="15">
+    </div>
+
+    <div class="text-end">
+      <button type="submit" class="btn btn-danger">Confirm Session</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

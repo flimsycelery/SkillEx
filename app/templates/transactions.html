@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Transaction History - SkillEx{% endblock %}
+
+{% block page_content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4" style="color: #2e224b;">Transaction History</h2>
+            
+            {% if transactions %}
+                <div class="card shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead style="background-color: #f8f9fa;">
+                                    <tr>
+                                        <th class="border-0">Date</th>
+                                        <th class="border-0">Type</th>
+                                        <th class="border-0">Amount</th>
+                                        <th class="border-0">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for transaction in transactions|sort(attribute='timestamp', reverse=true) %}
+                                        <tr>
+                                            <td>{{ transaction.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                                            <td>
+                                                {% if transaction.type == 'earn' %}
+                                                    <span class="badge bg-success">Earned</span>
+                                                {% else %}
+                                                    <span class="badge bg-primary">Spent</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if transaction.type == 'earn' %}
+                                                    <span class="text-success">+{{ transaction.amount }}</span>
+                                                {% else %}
+                                                    <span class="text-primary">{{ transaction.amount }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ transaction.description }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <div class="mb-3">
+                        <i class="fas fa-history fa-3x text-muted"></i>
+                    </div>
+                    <h4 class="text-muted">No transactions yet</h4>
+                    <p class="text-muted">Your transaction history will appear here when you start teaching or learning.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Suggested Matches | SkillEx{% endblock %}
+
+{% block page_content %}
+<style>
+    .match-card {
+        border-radius: 1rem;
+        background: #fff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .match-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .connect-btn {
+        background-color: #f77b9e;
+        color: white;
+        font-weight: bold;
+    }
+    .connect-btn:hover {
+        background-color: #f55d87;
+    }
+    .skill-tag {
+        background-color: #e9ecef;
+        color: #495057;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        margin-right: 0.25rem;
+        margin-bottom: 0.25rem;
+        display: inline-block;
+    }
+    .skill-section {
+        margin-bottom: 0.5rem;
+    }
+    .match-reason {
+        background-color: #f8f9fa;
+        border-left: 4px solid #f77b9e;
+        padding: 0.5rem 1rem;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+</style>
+
+<div class="container py-4">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold">Suggested Skill Buddies!</h2>
+        <p>Connect with these potential skill exchange partners</p>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="mb-3">
+        <input type="text" class="form-control" id="searchInput" placeholder="Search suggested matches...">
+    </div>
+
+    {% if suggested_users %}
+        <div id="suggestionsList">
+            {% for user in suggested_users %}
+                <div class="match-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <h5 class="fw-bold mb-2">{{ user.username }}</h5>
+                            
+                            {% if user.match_reasons %}
+                                {% for reason in user.match_reasons %}
+                                    <div class="match-reason">
+                                        <i class="fas fa-info-circle me-1"></i> {{ reason }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                            
+                            <div class="skill-section">
+                                <strong>Teaches:</strong>
+                                <div class="mt-1">
+                                    {% for skill in user.offers %}
+                                        <span class="skill-tag">{{ skill }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="skill-section">
+                                <strong>Wants to Learn:</strong>
+                                <div class="mt-1">
+                                    {% for skill in user.wants %}
+                                        <span class="skill-tag">{{ skill }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            {% if user.bio %}
+                                <p class="text-muted mt-2"><em>"{{ user.bio }}"</em></p>
+                            {% endif %}
+                        </div>
+                        <div class="ms-3">
+                            <form method="POST" action="{{ url_for('send_request', target_username=user.username) }}" style="display: inline;">
+                                <button type="submit" class="btn connect-btn">Connect</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">
+            <h5>No suggestions available</h5>
+            <p>We'll show you potential skill exchange partners here!</p>
+            <a href="{{ url_for('edit_skills') }}" class="btn btn-outline-secondary mt-2">Update My Skills</a>
+        </div>
+    {% endif %}
+
+    <div class="text-center mt-4">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+</div>
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function () {
+            const keyword = this.value.toLowerCase();
+            const cards = document.querySelectorAll('#suggestionsList .match-card');
+            cards.forEach(card => {
+                const name = card.querySelector('h5').innerText.toLowerCase();
+                const teaches = Array.from(card.querySelectorAll('.skill-section:first-of-type .skill-tag')).map(tag => tag.innerText.toLowerCase()).join(' ');
+                const wants = Array.from(card.querySelectorAll('.skill-section:last-of-type .skill-tag')).map(tag => tag.innerText.toLowerCase()).join(' ');
+                const searchText = name + ' ' + teaches + ' ' + wants;
+                card.style.display = searchText.includes(keyword) ? '' : 'none';
+            });
+        });
+    }
+</script>
+{% endblock %}

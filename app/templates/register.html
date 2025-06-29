@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block page_content %}
+<style>
+  .form-container {
+    max-width: 400px;
+    margin: 60px auto;
+    padding: 30px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  .title {
+    font-weight: bold;
+    font-size: 28px;
+    color: #e94e77;
+  }
+  .subtitle {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  .btn-custom {
+    background-color: #f2648c;
+    color: white;
+  }
+  .btn-custom:hover {
+    background-color: #e94e77;
+  }
+</style>
+
+<div class="text-center mt-4">
+  <div class="title">SkillEx</div>
+  <div class="subtitle">Exchange skills, grow together</div>
+</div>
+
+<div class="form-container shadow-sm">
+  <h6 class="mb-3 fw-semibold">Create your account</h6>
+  <p class="text-muted" style="font-size: 14px;">Join the SkillEx community today</p>
+  <form method="POST" action="{{ url_for('register') }}">
+    <div class="mb-3">
+      <label for="username" class="form-label">Username</label>
+      <input type="text" name="username" id="username" class="form-control" placeholder="Choose a username" required>
+    </div>
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input type="email" name="email" id="email" class="form-control" placeholder="you@example.com" required>
+    </div>
+    <div class="mb-4">
+      <label for="password" class="form-label">Password</label>
+      <input type="password" name="password" id="password" class="form-control" placeholder="Create a password" required>
+    </div>
+    <button type="submit" class="btn btn-custom w-100">Register</button>
+  </form>
+  <p class="text-center mt-3" style="font-size: 14px;">
+    Already have an account? <a href="{{ url_for('login') }}">Log in</a>
+  </p>
+</div>
+{% endblock %}

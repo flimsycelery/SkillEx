@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Edit Skills | SkillEx{% endblock %}
+{% block page_content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Skills I Can Teach</h4>
+                    <form method="POST" action="{{ url_for('edit_skills') }}">
+                        <div class="mb-3">
+                            <label class="form-label">Select your teaching skills:</label>
+                            <div class="row">
+                                {% for skill in all_skills %}
+                                <div class="col-md-6 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="offers" value="{{ skill }}"
+                                            id="offer_{{ skill|replace(' ', '_')|lower }}"
+                                            {% if skill in selected_offers %}checked{% endif %}>
+                                        <label class="form-check-label" for="offer_{{ skill|replace(' ', '_')|lower }}">
+                                            {{ skill }}
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h4 class="card-title mb-4">Skills I Want to Learn</h4>
+                    <div class="mb-3">
+                        <label class="form-label">Select skills you want to learn:</label>
+                        <div class="row">
+                            {% for skill in all_skills %}
+                            <div class="col-md-6 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="wants" value="{{ skill }}"
+                                        id="want_{{ skill|replace(' ', '_')|lower }}"
+                                        {% if skill in selected_wants %}checked{% endif %}>
+                                    <label class="form-check-label" for="want_{{ skill|replace(' ', '_')|lower }}">
+                                        {{ skill }}
+                                    </label>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12 text-center">
+            <a href="{{ url_for('profile') }}" class="btn btn-secondary me-2">Cancel</a>
+            <button type="submit" class="btn btn-danger">Save Skills</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

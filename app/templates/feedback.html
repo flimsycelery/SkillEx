@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block page_content %}
+<div class="container mt-5">
+  <h2>Leave Feedback</h2>
+  <form method="POST" action="{{ url_for('feedback') }}" class="mb-4">
+    <div class="mb-3">
+      <label for="target_user" class="form-label">User</label>
+      <select class="form-select" id="target_user" name="target_user" required>
+        <option value="">Select user...</option>
+        {% for user in feedback_users %}
+          <option value="{{ user.username }}">{{ user.username }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="rating" class="form-label">Rating</label>
+      <select class="form-select" id="rating" name="rating" required>
+        <option value="">Select rating...</option>
+        {% for i in range(1, 6) %}
+          <option value="{{ i }}">{{ i }} Star{{ 's' if i > 1 else '' }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="comment" class="form-label">Comment</label>
+      <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Feedback</button>
+  </form>
+
+  <h3>Feedback Received</h3>
+  {% if feedback_received %}
+    <ul class="list-group">
+      {% for fb in feedback_received %}
+        <li class="list-group-item">
+          <strong>From:</strong> {{ fb.from_user }}<br>
+          <strong>Rating:</strong> {{ fb.rating }}<br>
+          <strong>Comment:</strong> {{ fb.comment }}<br>
+          <small class="text-muted">{{ fb.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No feedback received yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

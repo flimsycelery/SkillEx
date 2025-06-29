@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to SkillEx{% endblock %}
+
+{% block page_content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h1 class="display-4 mb-4">Welcome to SkillEx</h1>
+            <p class="lead mb-4">Exchange skills, learn from others, and grow together in our community of learners and teachers.</p>
+            
+            <div class="row justify-content-center mb-5">
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <i class="fas fa-graduation-cap fa-3x mb-3 text-primary"></i>
+                            <h5 class="card-title">Learn New Skills</h5>
+                            <p class="card-text">Connect with experienced teachers and learn skills you've always wanted to master.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <i class="fas fa-chalkboard-teacher fa-3x mb-3 text-primary"></i>
+                            <h5 class="card-title">Share Your Knowledge</h5>
+                            <p class="card-text">Teach others and earn credits while sharing your expertise.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <i class="fas fa-users fa-3x mb-3 text-primary"></i>
+                            <h5 class="card-title">Build Connections</h5>
+                            <p class="card-text">Join a community of learners and teachers passionate about sharing knowledge.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg px-4 gap-3">Login</a>
+                <a href="{{ url_for('register') }}" class="btn btn-outline-primary btn-lg px-4">Register</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.text-primary {
+    color: #2e224b !important;
+}
+
+.btn-primary {
+    background-color: #2e224b;
+    border-color: #2e224b;
+}
+
+.btn-primary:hover {
+    background-color: #1a1530;
+    border-color: #1a1530;
+}
+
+.btn-outline-primary {
+    color: #2e224b;
+    border-color: #2e224b;
+}
+
+.btn-outline-primary:hover {
+    background-color: #2e224b;
+    border-color: #2e224b;
+}
+</style>
+{% endblock %} 

@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | SkillEx{% endblock %}
+{% block page_content %}
+
+<style>
+  body {
+    background-color: #fef6f6;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .dashboard-welcome {
+    font-size: 28px;
+    font-weight: bold;
+    color: #2d2d2d;
+  }
+  .dashboard-section {
+    background-color: #fff;
+    border: 1px solid #e9dcdc;
+    border-radius: 12px;
+    padding: 20px;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .dashboard-section h4 {
+    font-weight: 600;
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+  .dashboard-section p {
+    font-size: 14px;
+    color: #6c6c6c;
+  }
+  .dashboard-button {
+    background-color: #f2648c;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  .dashboard-button:hover {
+    background-color: #e94e77;
+  }
+</style>
+
+<div class="container mt-5">
+  <div class="dashboard-welcome mb-2">Welcome, {{ user.username }}!</div>
+  <p class="text-muted">Here's what's happening with your skill exchanges</p>
+
+  <div class="row mt-4 g-4">
+    <div class="col-md-4">
+      <div class="dashboard-section">
+        <div>
+          <h4>Your Skills</h4>
+          <p>Skills you can teach and want to learn</p>
+          <strong>Skills I can teach:</strong>
+          <p>{% if user.offers %}{{ user.offers | join(', ') }}{% else %}You haven't added any skills yet{% endif %}</p>
+          <strong>Skills I want to learn:</strong>
+          <p>{% if user.wants %}{{ user.wants | join(', ') }}{% else %}You haven't added any skills yet{% endif %}</p>
+        </div>
+        <div>
+          <a href="{{ url_for('select_skills') }}" class="btn btn-outline-secondary">Edit Skills</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="dashboard-section">
+        <div>
+          <h4>Your Matches</h4>
+          <p>People you're currently exchanging skills with</p>
+          {% if matches %}
+          <ul>
+            {% for match in matches %}
+              <li><strong>{{ match.username }}</strong> — offers: {{ match.offers | join(', ') }}</li>
+            {% endfor %}
+          </ul>
+          {% else %}
+    <p class="text-muted">You don't have any matches yet</p>
+{% endif %}
+
+        </div>
+        <div>
+          <a href="{{ url_for('matches') }}" class="dashboard-button">View All Matches</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="dashboard-section">
+        <div>
+          <h4>Suggested Matches</h4>
+          <p>People you might want to connect with</p>
+          {% if suggestions %}
+          <ul class="ps-3">
+            {% for s in suggestions %}
+              <li><strong>{{ s.username }}</strong> — offers: {{ s.offers | join(', ') }}</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted">No suggestions available right now</p>
+        {% endif %}
+        </div>
+        <div>
+          <a href="{{ url_for('suggested') }}" class="btn btn-outline-secondary">Find More Matches</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

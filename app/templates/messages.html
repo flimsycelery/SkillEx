@@ -1,0 +1,633 @@
+{% extends "base.html" %}
+
+{% block title %}{% if other_user %}Chat with {{ other_user }}{% else %}Messages{% endif %} - SkillEx{% endblock %}
+
+{% block styles %}
+<style>
+    body {
+        padding-bottom: 70px; /* Adjust based on chat-input height */
+    }
+
+    .messages-container {
+        display: flex;
+        height: 85vh;
+        overflow: hidden;
+        background-color: #F8F0F9;
+    }
+
+    .contact-list-messages {
+        min-width: 250px;
+        width: 300px;
+        background-color: #fff;
+        border-right: 1px solid #dee2e6;
+        overflow-y: auto;
+        padding: 20px;
+    }
+
+    .messages-chat-area.placeholder {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        background-color: #fff;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    .messages-chat-area.placeholder h4,
+    .messages-chat-area.placeholder p {
+        color: #884A8E;
+    }
+
+    .chat-area {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        background-color: #fff;
+        position: relative;
+    }
+
+    .chat-header {
+        background-color: #fff;
+        border-bottom: 1px solid #f0f0f0;
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+        height: 70px;
+    }
+
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        background-color: #F8F0F9;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding-bottom: 85px;
+    }
+
+    .message-bubble {
+        max-width: 70%;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+        padding: 10px 14px;
+        border-radius: 18px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .message-bubble.sent {
+        align-self: flex-end !important;
+    }
+    .message-bubble.received {
+        align-self: flex-start !important;
+    }
+
+
+    .message-time {
+        font-size: 0.75rem;
+        opacity: 0.7;
+        margin-top: 4px;
+        align-self: flex-end;
+    }
+
+    .chat-input-container {
+        position: fixed;
+        bottom: 0;
+        width: calc(100% - 250px - 300px);
+        background-color: #fff;
+        border-top: 1px solid #f0f0f0;
+        padding: 15px 20px;
+        z-index: 1000;
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+        left: 550px;
+    }
+
+    .message-form {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        width: 100%;
+        gap: 10px;
+    }
+
+    .message-form .form-control {
+        flex: 1;
+        width: 100%;
+    }
+
+    .chat-input button {
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #884A8E;
+        border-color: #884A8E;
+        color: white;
+    }
+
+    .chat-input button:hover {
+        background-color: #6C3970;
+        border-color: #6C3970;
+    }
+
+    .user-avatar {
+        width: 48px;
+        height: 48px;
+        background-color: #884A8E;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1.25rem;
+    }
+
+    .typing-indicator {
+        font-size: 0.875rem;
+        color: #666;
+        font-style: italic;
+        padding: 8px 16px;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 16px;
+        margin: 4px 0;
+        align-self: flex-start;
+    }
+
+    .no-messages {
+        text-align: center;
+        padding: 40px 20px;
+        color: #666;
+        margin: auto;
+    }
+
+    .no-messages i {
+        font-size: 3rem;
+        color: #884A8E;
+        opacity: 0.7;
+        margin-bottom: 1rem;
+    }
+
+    .btn-outline-danger.pink-theme {
+        color: #884A8E;
+        border-color: #884A8E;
+    }
+
+    .btn-outline-danger.pink-theme:hover {
+        background-color: #884A8E;
+        color: white;
+    }
+
+    .search-input {
+        border: 1px solid #f0f0f0;
+        border-radius: 24px;
+        padding: 10px 15px;
+        font-size: 0.9rem;
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .search-input:focus {
+        border-color: #884A8E;
+        box-shadow: 0 0 0 0.2rem rgba(136, 74, 142, 0.25);
+    }
+
+    .messages-contact-item {
+        transition: all 0.3s ease;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 5px;
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .messages-contact-item:hover {
+        background-color: #fdf2f7;
+    }
+
+    .messages-contact-item.active {
+        background-color: #fdf2f7 !important;
+        font-weight: bold;
+        border-left: 3px solid #884A8E !important;
+    }
+
+    .messages-avatar {
+        width: 48px;
+        height: 48px;
+        background-color: #884A8E;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1.25rem;
+    }
+
+    .messages-latest-text {
+        font-size: 0.85rem;
+        color: #777;
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .messages-no-contacts {
+        text-align: center;
+        padding: 40px 20px;
+        color: #666;
+    }
+
+    .messages-no-contacts i {
+        font-size: 3rem;
+        color: #884A8E;
+        opacity: 0.7;
+        margin-bottom: 1rem;
+    }
+
+    .messages-find-connections-btn {
+        background-color: #884A8E;
+        border-color: #884A8E;
+    }
+
+    .messages-find-connections-btn:hover {
+        background-color: #6C3970;
+        border-color: #6C3970;
+    }
+
+    .intro-message-icon {
+        font-size: 3rem;
+        color: #884A8E;
+        opacity: 0.7;
+        margin-bottom: 1rem;
+    }
+
+</style>
+{% endblock %}
+
+{% block page_content %}
+<div class="messages-container">
+    <div class="contact-list-messages">
+        <h5 class="mb-3" style="color: #884A8E;">Chat with your skill exchange partners</h5>
+        
+        <input type="text" class="form-control search-input" placeholder="Search contacts...">
+
+        {% if connections %}
+            <div class="list-group list-group-flush">
+                {% for connection in connections %}
+                    <a href="{{ url_for('messages', other_user=connection.username) }}"
+                       class="list-group-item list-group-item-action messages-contact-item {% if connection.username == other_user %}active{% endif %}"
+                       data-username="{{ connection.username }}">
+                        <div class="d-flex align-items-center">
+                            <div class="messages-avatar me-3">
+                                {{ connection.username[0].upper() }}
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0">{{ connection.username }}</h6>
+                                    {% if connection.latest_message %}
+                                        <small class="text-muted messages-latest-text">
+                                            {{ connection.latest_message.timestamp.split('T')[1][:5] }}
+                                        </small>
+                                    {% endif %}
+                                </div>
+                                {% if connection.latest_message %}
+                                    <p class="mb-0 text-muted small messages-latest-text">
+                                        {{ connection.latest_message.message }}
+                                    </p>
+                                {% else %}
+                                    <p class="mb-0 text-muted small">No messages yet</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="messages-no-contacts">
+                <div class="mb-3">
+                    <i class="fas fa-comments fa-3x" style="color: #884A8E; opacity: 0.7;"></i>
+                </div>
+                <h4 class="text-muted">No contacts yet</h4>
+                <p class="text-muted">Connect with people on the <a href="{{ url_for('matches') }}">Matches</a> page to start chatting</p>
+            </div>
+        {% endif %}
+    </div>
+    
+
+    <div class="chat-area">
+        {% if other_user %}
+
+            <div class="chat-header">
+                <div class="d-flex align-items-center w-100 justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <div class="user-avatar me-3">
+                            {{ other_user[0].upper() }}
+                        </div>
+                        <div>
+                            <h5 class="mb-0">{{ other_user }}</h5>
+                            {% if other_user_data %}
+                                <small class="text-muted">
+                                    {% if other_user_data.offers %}
+                                        Teaches: {{ other_user_data.offers|join(', ') }}
+                                    {% endif %}
+                                </small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <form action="{{ url_for('clear_chat', other_user=other_user) }}" method="POST" onsubmit="return confirm('Are you sure you want to clear the chat with {{ other_user }}?');">
+                        <button class="btn btn-sm btn-outline-danger pink-theme">Clear Chat</button>
+                    </form>                          
+                </div>
+            </div>
+            
+
+            <div class="chat-messages p-3 flex-grow-1 overflow-auto" id="messages" style="height: 500px;">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="d-flex mb-2 {% if message.sender == current_user.username %}justify-content-end{% else %}justify-content-start{% endif %}">
+                            <div class="message-bubble {% if message.sender == current_user.username %}sent{% else %}received{% endif %}">
+                                <div class="message-bubble sent" style="background: red;">
+                                    test
+                                </div>
+                                
+                                <div>{{ message.content }}</div>
+                                <div class="message-time">{{ message.timestamp.strftime('%H:%M') }}</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-messages text-center mt-5">
+                        <i class="fas fa-comments fa-2x" style="color: #884A8E; opacity: 0.7;"></i>
+                        <h4 class="text-muted">No messages yet</h4>
+                        <p class="text-muted">Start the conversation!</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+
+            <div class="chat-input-container">
+                <form id="message-form" class="message-form">
+                    <input type="text" id="message" class="form-control" placeholder="Type a message..." required>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        {% else %}
+            <div class="messages-chat-area placeholder">
+                <i class="fas fa-comment-dots intro-message-icon"></i>
+                <h4 class="mb-2">Select a contact to start chatting</h4>
+                <p class="text-muted">Your matched users will appear in the contacts list</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="error-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-danger text-white">
+            <strong class="me-auto">Error</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="error-message"></div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script>
+    const CURRENT_USER = "{{ current_user.username }}";
+    const OTHER_USER = "{{ other_user }}"; 
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const socket = io({
+            reconnection: true,
+            reconnectionAttempts: 5,
+            reconnectionDelay: 1000,
+            timeout: 10000
+        });
+        
+        const messageForm = document.getElementById('message-form');
+        const messageInput = document.getElementById('message');
+        const messagesDiv = document.getElementById('messages');
+        const errorToast = new bootstrap.Toast(document.getElementById('error-toast'));
+        const errorMessage = document.getElementById('error-message');
+        let isConnected = false;
+        let typingTimeout = null;
+
+        function scrollToBottom() {
+            if (messagesDiv) { 
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+        }
+        
+
+        function showLoading() {
+            if (!messagesDiv) return;
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = 'loading-message';
+            loadingDiv.className = 'text-center py-3';
+            loadingDiv.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+            messagesDiv.appendChild(loadingDiv);
+            scrollToBottom();
+        }
+
+        function removeLoading() {
+            const loadingDiv = document.getElementById('loading-message');
+            if (loadingDiv) {
+                loadingDiv.remove();
+            }
+        }
+
+        function showTypingIndicator() {
+            if (!messagesDiv) return;
+            let typingDiv = document.getElementById('typing-indicator');
+            if (!typingDiv) {
+                typingDiv = document.createElement('div');
+                typingDiv.id = 'typing-indicator';
+                typingDiv.className = 'typing-indicator';
+                messagesDiv.appendChild(typingDiv);
+            }
+            typingDiv.textContent = `${OTHER_USER} is typing...`;
+            scrollToBottom();
+        }
+        
+        function removeTypingIndicator() {
+            const typingDiv = document.getElementById('typing-indicator');
+            if (typingDiv) {
+                typingDiv.remove();
+            }
+        }
+        
+        socket.on('connect', function() {
+            isConnected = true;
+            console.log('Socket connected!'); 
+            removeLoading();
+            if (OTHER_USER) {
+                socket.emit('join', {
+                    other_user: OTHER_USER
+                });
+            }
+        });
+        
+        socket.on('disconnect', function() {
+            isConnected = false;
+            showLoading();
+            errorMessage.textContent = 'Connection lost. Attempting to reconnect...';
+            errorToast.show();
+        });
+        
+
+        socket.on('message', function(data) {
+            console.log('Received message:', data);
+            removeLoading();
+            removeTypingIndicator();
+            
+
+            const noMessagesDiv = messagesDiv ? messagesDiv.querySelector('.no-messages') : null;
+            if (noMessagesDiv) {
+                console.log('Attempting to remove no messages div.'); 
+                noMessagesDiv.remove();
+            }
+
+            if (messagesDiv) { 
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `d-flex mb-2 ${data.username === CURRENT_USER ? 'justify-content-end' : 'justify-content-start'}`;
+                
+                const messageBubble = document.createElement('div');
+                messageBubble.className = `message-bubble ${data.username === CURRENT_USER ? 'sent' : 'received'}`;
+
+                const messageTimestamp = new Date(data.timestamp);
+                const timestamp = messageTimestamp.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                });
+                
+                messageBubble.innerHTML = `
+                    <div>${data.message}</div>
+                    <div class="message-time">
+                        ${timestamp}
+                    </div>
+                `;
+                
+                messageDiv.appendChild(messageBubble);
+                messagesDiv.appendChild(messageDiv);
+                scrollToBottom();
+            }
+        });
+        
+
+        socket.on('typing', function(data) {
+            if (data.username !== CURRENT_USER) {
+                showTypingIndicator();
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(removeTypingIndicator, 3000);
+            }
+        });
+
+        socket.on('error', function(data) {
+            removeLoading();
+            removeTypingIndicator();
+            errorMessage.textContent = data.message;
+            errorToast.show();
+        });
+        
+      
+        if (messageForm) { 
+            messageForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const message = messageInput.value.trim();
+                
+                if (message) {
+                    if (!isConnected) {
+                        errorMessage.textContent = 'Not connected to server. Please wait...';
+                        errorToast.show();
+                        return;
+                    }
+                    
+                    socket.emit('message', {
+                        message: message,
+                        other_user: OTHER_USER 
+                    });
+                    messageInput.value = '';
+                    messageInput.focus();
+                }
+            });
+        }
+        
+
+        if (messageInput) {
+            messageInput.addEventListener('input', function() {
+                if (isConnected) {
+                    socket.emit('typing', {
+                        other_user: OTHER_USER 
+                    });
+                }
+            });
+        }
+        
+
+        socket.on('connect_error', function() {
+            isConnected = false;
+            showLoading();
+            errorMessage.textContent = 'Connection lost. Please refresh the page.';
+            errorToast.show();
+        });
+        
+
+        socket.on('reconnect_attempt', function() {
+            errorMessage.textContent = 'Attempting to reconnect...';
+            errorToast.show();
+        });
+
+        socket.on('reconnect', function() {
+            isConnected = true;
+            removeLoading();
+            errorMessage.textContent = 'Reconnected successfully!';
+            errorToast.show();
+            if (OTHER_USER) { 
+                socket.emit('join', {
+                    other_user: OTHER_USER
+                });
+            }
+        });
+
+        if (messagesDiv && messagesDiv.querySelectorAll('.message-bubble').length === 0 && OTHER_USER) {
+            const noMessagesDiv = document.createElement('div');
+            noMessagesDiv.className = 'no-messages text-center mt-5';
+            noMessagesDiv.innerHTML = `
+                <i class="fas fa-comments fa-2x" style="color: #884A8E; opacity: 0.7;"></i>
+                <h4 class="text-muted">No messages yet</h4>
+                <p class="text-muted">Start the conversation!</p>
+            `;
+            messagesDiv.appendChild(noMessagesDiv);
+        } else if (messagesDiv) {
+            const existingNoMessagesDiv = messagesDiv.querySelector('.no-messages');
+            if (existingNoMessagesDiv) {
+                existingNoMessagesDiv.remove();
+            }
+        }
+
+
+        if (messagesDiv) {
+            scrollToBottom();
+        }
+        
+
+        if (messageInput) {
+            messageInput.focus();
+        }
+    });
+</script>
+{% endblock %}
+

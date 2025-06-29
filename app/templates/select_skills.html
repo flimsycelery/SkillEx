@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Setup Your Skills | SkillEx{% endblock %}
+{% block page_content %}
+<div class="container my-5">
+  <div class="text-center">
+    <h2 class="fw-bold text-danger">Setup Your Profile</h2>
+    <p class="text-muted">Let's personalize your experience</p>
+    <div class="d-flex justify-content-center mb-3">
+      <span class="me-1 text-danger">●</span>
+      <span class="me-1 text-danger">●</span>
+      <span class="text-secondary">●</span>
+    </div>
+  </div>
+
+  <form method="POST" class="bg-white p-4 rounded shadow-sm">
+    <h4 class="mb-3">Your Skills</h4>
+    <p class="text-muted">Tell us what you can teach and what you want to learn</p>
+
+    <div class="mb-4">
+      <label for="bio" class="form-label fw-semibold">Short Bio</label>
+      <textarea class="form-control" id="bio" name="bio" rows="3" placeholder="Tell us about yourself...">{{ user.bio if user and user.bio else '' }}</textarea>
+    </div>
+
+    <div class="mb-4">
+      <h5>Skills I can teach:</h5>
+      <div class="d-flex flex-wrap gap-2">
+        {% for skill in [
+          'Python', 'JavaScript', 'Java', 'C++', 'C#', 'Ruby', 'PHP', 'Swift', 'Kotlin', 'Go',
+        'HTML/CSS', 'React', 'Angular', 'Vue.js', 'Node.js', 'Django', 'Flask', 'Spring Boot',
+        'SQL', 'MongoDB', 'AWS', 'Docker', 'Kubernetes', 'Git',
+
+        'UI/UX Design', 'Graphic Design', 'Web Design', 'Illustration', 'Digital Art',
+        '3D Modeling', 'Animation', 'Video Editing', 'Photography', 'Photo Editing',
+
+        'Project Management', 'Business Analysis', 'Data Analysis', 'Excel', 'Power BI',
+
+        'English', 'Spanish', 'French', 'German', 'Chinese', 'Japanese', 'Korean',
+        'Portuguese', 'Italian', 'Russian',
+
+        'Piano', 'Guitar', 'Violin', 'Drums', 'Singing', 'Music Theory', 'Composition',
+        'Drawing', 'Painting', 'Sculpture',
+
+        'Cooking', 'Baking', 'Gardening', 'Fitness', 'Yoga', 'Meditation',
+        'Time Management', 'Personal Finance', 'Leadership', 'Communication'
+        ] %}
+        <div class="form-check form-check-inline">
+          <input class="btn-check" type="checkbox" name="offers" id="teach_{{ skill }}" value="{{ skill }}"
+            {% if user and user.offers and skill in user.offers %}checked{% endif %}>
+          <label class="btn btn-outline-danger" for="teach_{{ skill }}">Teach {{ skill }}</label>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <h5>Skills I want to learn:</h5>
+      <div class="d-flex flex-wrap gap-2">
+        {% for skill in [
+          'Python', 'JavaScript', 'Java', 'C++', 'C#', 'Ruby', 'PHP', 'Swift', 'Kotlin', 'Go',
+        'HTML/CSS', 'React', 'Angular', 'Vue.js', 'Node.js', 'Django', 'Flask', 'Spring Boot',
+        'SQL', 'MongoDB', 'AWS', 'Docker', 'Kubernetes', 'Git',
+
+        'UI/UX Design', 'Graphic Design', 'Web Design', 'Illustration', 'Digital Art',
+        '3D Modeling', 'Animation', 'Video Editing', 'Photography', 'Photo Editing',
+
+        'Project Management', 'Business Analysis', 'Data Analysis', 'Excel', 'Power BI',
+
+        'English', 'Spanish', 'French', 'German', 'Chinese', 'Japanese', 'Korean',
+        'Portuguese', 'Italian', 'Russian',
+
+        'Piano', 'Guitar', 'Violin', 'Drums', 'Singing', 'Music Theory', 'Composition',
+        'Drawing', 'Painting', 'Sculpture',
+
+        'Cooking', 'Baking', 'Gardening', 'Fitness', 'Yoga', 'Meditation',
+        'Time Management', 'Personal Finance', 'Leadership', 'Communication'
+        ] %}
+        <div class="form-check form-check-inline">
+          <input class="btn-check" type="checkbox" name="wants" id="learn_{{ skill }}" value="{{ skill }}"
+            {% if user and user.wants and skill in user.wants %}checked{% endif %}>
+          <label class="btn btn-outline-secondary" for="learn_{{ skill }}">Learn {{ skill }}</label>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="text-end">
+      <button type="submit" class="btn btn-danger">Save Skills</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+

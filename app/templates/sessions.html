@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Learning Sessions | SkillEx{% endblock %}
+{% block page_content %}
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-danger">Your Upcoming Sessions</h2>
+    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#scheduleSessionModal">
+      <i class="fas fa-plus"></i> Schedule New Session
+    </button>
+  </div>
+
+  {% if sessions|length == 0 %}
+    <div class="alert alert-info">You have no scheduled sessions yet.</div>
+  {% endif %}
+
+  {% for session in sessions %}
+    <div class="card p-3 mb-3 shadow-sm">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="fw-bold">
+            {{ 'Learning from' if session.learner == user else 'Teaching to' }}
+            {{ session.teacher if session.learner == user else session.learner }}
+          </h5>
+          <p><strong>Skill:</strong> {{ session.skill }}</p>
+          <p><strong>Objectives:</strong> {{ session.objectives }}</p>
+          <p><strong>Time:</strong> {{ session.start_time }} ({{ session.duration_minutes }} mins)</p>
+          <span class="badge bg-secondary">{{ session.status.capitalize() }}</span>
+          {% if session.status != 'completed' %}
+            <form action="{{ url_for('complete_session', session_id=session._id) }}" method="POST" style="display:inline; margin-left: 10px;">
+              <button type="submit" class="btn btn-success btn-sm">Complete</button>
+            </form>
+          {% else %}
+            <span class="badge bg-success" style="margin-left: 10px;">Completed</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+<div class="modal fade" id="scheduleSessionModal" tabindex="-1" aria-labelledby="scheduleSessionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="scheduleSessionModalLabel">Schedule New Session</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="scheduleSessionForm" action="{{ url_for('create_session') }}" method="POST">
+          <div class="mb-3">
+            <label for="sessionType" class="form-label">Session Type</label>
+            <select class="form-select" id="sessionType" name="session_type" required>
+              <option value="">Select type...</option>
+              <option value="teaching">Teaching Session</option>
+              <option value="learning">Learning Session</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label for="partner" class="form-label">Partner</label>
+            <select class="form-select" id="partner" name="partner" required>
+              <option value="">Select partner...</option>
+              {% for connection in connections %}
+                <option value="{{ connection.username }}">{{ connection.username }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="skill" class="form-label">Skill</label>
+            <input type="text" class="form-control" id="skill" name="skill" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="objectives" class="form-label">Learning Objectives</label>
+            <textarea class="form-control" id="objectives" name="objectives" rows="3" required></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="startTime" class="form-label">Start Time</label>
+            <input type="datetime-local" class="form-control" id="startTime" name="start_time" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="duration" class="form-label">Duration (minutes)</label>
+            <input type="number" class="form-control" id="duration" name="duration_minutes" min="15" max="180" step="15" value="60" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" form="scheduleSessionForm" class="btn btn-danger">Schedule Session</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

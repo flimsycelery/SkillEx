@@ -1,0 +1,25 @@
+
+.match-card {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    background-color: #f9f9f9;
+}
+
+.match-bar-container {
+    margin: 10px 0;
+}
+
+.match-bar-bg {
+    width: 100%;
+    height: 10px;
+    background-color: #ddd;
+    border-radius: 5px;
+}
+
+.match-bar-fill {
+    height: 10px;
+    background-color: #4caf50;
+    border-radius: 5px;
+}

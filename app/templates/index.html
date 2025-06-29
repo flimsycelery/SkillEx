@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to SkillEx{% endblock %}
+
+{% block page_content %}
+<div class="container py-5">
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <h1 class="display-4 fw-bold mb-4" style="color: #2e224b;">Exchange Skills, Grow Together</h1>
+            <p class="lead mb-4" style="color: #666;">
+                Join our community of learners and teachers. Share your expertise, learn new skills, and build meaningful connections.
+            </p>
+            <div class="d-grid gap-2 d-md-flex">
+                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-4 me-md-2" style="background-color: #2e224b; border-color: #2e224b;">Get Started</a>
+                <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-lg px-4">Sign In</a>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-body p-5">
+                    <h3 class="text-center mb-4" style="color: #2e224b;">How It Works</h3>
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background-color: #2e224b;">1</div>
+                                <div class="ms-3">
+                                    <h5 class="mb-1">Create Your Profile</h5>
+                                    <p class="mb-0 text-muted">List the skills you can teach and what you want to learn</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background-color: #2e224b;">2</div>
+                                <div class="ms-3">
+                                    <h5 class="mb-1">Find Matches</h5>
+                                    <p class="mb-0 text-muted">Connect with people who complement your skills</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background-color: #2e224b;">3</div>
+                                <div class="ms-3">
+                                    <h5 class="mb-1">Start Learning & Teaching</h5>
+                                    <p class="mb-0 text-muted">Exchange skills and earn credits as you teach</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

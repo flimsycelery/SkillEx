@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Transaction History - SkillEx{% endblock %}
+
+{% block page_content %}
+<div class="container">
+    <h2 class="mb-4">Transaction History</h2>
+    
+    {% if transactions %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions|sort(attribute='timestamp', reverse=true) %}
+                    <tr>
+                        <td>{{ transaction.timestamp }}</td>
+                        <td>
+                            {% if transaction.type == 'earn' %}
+                                <span class="text-success">Earned</span>
+                            {% else %}
+                                <span class="text-danger">Spent</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if transaction.type == 'earn' %}
+                                <span class="text-success">+{{ transaction.amount }}</span>
+                            {% else %}
+                                <span class="text-danger">{{ transaction.amount }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ transaction.description }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            You haven't made any transactions yet.
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 
