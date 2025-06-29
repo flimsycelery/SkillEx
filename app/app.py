@@ -233,7 +233,7 @@ def select_skills():
             }
         })
         flash('Skills saved successfully!', 'success')
-        return redirect(url_for('dashboard'))  # or wherever you want to go after
+        return redirect(url_for('dashboard'))  
 
     return render_template('select_skills.html', user=user)
 
@@ -252,7 +252,6 @@ def matches():
     connections = user.get('connections', [])
     pending = user.get('pending_requests', [])
 
-    # Fetch users connected with this user
     connected_users = users_col.find({'username': {'$in': connections}})
     connected_list = []
     for cu in connected_users:
@@ -261,7 +260,6 @@ def matches():
             cu['similarity'] = round(sim * 100, 2)
         connected_list.append(cu)
 
-    # Fetch users you sent requests to
     pending_users = users_col.find({'username': {'$in': pending}})
     pending_list = []
     for pu in pending_users:
@@ -270,7 +268,6 @@ def matches():
             pu['similarity'] = round(sim * 100, 2)
         pending_list.append(pu)
 
-    # Suggested users are the rest (can reuse logic from `/suggested`)
     suggestions = []
     all_users = users_col.find({
         'username': {'$ne': username, '$nin': connections + pending},
