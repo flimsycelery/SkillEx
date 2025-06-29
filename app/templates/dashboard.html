@@ -42,6 +42,11 @@
   .dashboard-button:hover {
     background-color: #e94e77;
   }
+  .match-similarity {
+    color: #f2648c;
+    font-weight: 600;
+    margin-left: 6px;
+  }
 </style>
 
 <div class="container mt-5">
@@ -76,9 +81,8 @@
             {% endfor %}
           </ul>
           {% else %}
-    <p class="text-muted">You don't have any matches yet</p>
-{% endif %}
-
+            <p class="text-muted">You don't have any matches yet</p>
+          {% endif %}
         </div>
         <div>
           <a href="{{ url_for('matches') }}" class="dashboard-button">View All Matches</a>
@@ -93,12 +97,18 @@
           {% if suggestions %}
           <ul class="ps-3">
             {% for s in suggestions %}
-              <li><strong>{{ s.username }}</strong> — offers: {{ s.offers | join(', ') }}</li>
+              <li>
+                <strong>{{ s.username }}</strong>
+                {% if s.similarity %}
+                  <span class="match-similarity">(Match: {{ s.similarity }}%)</span>
+                {% endif %}
+                — offers: {{ s.offers | join(', ') }}
+              </li>
             {% endfor %}
           </ul>
-        {% else %}
-          <p class="text-muted">No suggestions available right now</p>
-        {% endif %}
+          {% else %}
+            <p class="text-muted">No suggestions available right now</p>
+          {% endif %}
         </div>
         <div>
           <a href="{{ url_for('suggested') }}" class="btn btn-outline-secondary">Find More Matches</a>
@@ -108,4 +118,5 @@
   </div>
 </div>
 {% endblock %}
+
 

@@ -44,6 +44,11 @@
         margin-bottom: 1rem;
         font-size: 0.9rem;
     }
+    .match-score {
+        color: #f2648c;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
 </style>
 
 <div class="container py-4">
@@ -63,7 +68,10 @@
                 <div class="match-card">
                     <div class="d-flex justify-content-between align-items-start">
                         <div class="flex-grow-1">
-                            <h5 class="fw-bold mb-2">{{ user.username }}</h5>
+                            <h5 class="fw-bold mb-1">{{ user.username }}</h5>
+                            {% if user.similarity %}
+                                <p class="match-score">Match Score: {{ user.similarity }}%</p>
+                            {% endif %}
                             
                             {% if user.match_reasons %}
                                 {% for reason in user.match_reasons %}

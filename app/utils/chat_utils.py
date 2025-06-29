@@ -46,12 +46,10 @@ def format_message_for_socket(message: dict[str, Any]) -> dict[str, Any]:
 def format_messages_for_display(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
     formatted = []
     for msg in messages:
-        # Robustly get sender and message text, handling potential missing keys
         sender_name = msg.get("sender") or msg.get("username", "Unknown")
         message_text = msg.get("content") or msg.get("message", "")
-        timestamp = msg.get("timestamp", datetime.now()) # Default to now if timestamp is missing
+        timestamp = msg.get("timestamp", datetime.now())
 
-        # Ensure timestamp is a datetime object before formatting
         if isinstance(timestamp, str):
             timestamp = parse_timestamp(timestamp)
 
@@ -64,7 +62,6 @@ def format_messages_for_display(messages: list[dict[str, Any]]) -> list[dict[str
 
 def validate_message(message: dict[str, Any]) -> Optional[str]:
     try:
-        # Check for message content using both 'content' and 'message' keys
         message_text = message.get('content') or message.get('message')
         
         if not isinstance(message_text, str):

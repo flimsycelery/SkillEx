@@ -160,39 +160,38 @@ def logout():
 def dashboard():
     if 'username' not in session:
         return redirect(url_for('login'))
-    
+
     username = session['username']
     user = users_col.find_one({'username': username})
-    
+
     if not user:
         session.pop('username', None)
         flash('User not found. Please log in again.')
         return redirect(url_for('login'))
 
-    if 'offers' not in user:
-        user['offers'] = []
-    if 'wants' not in user:
-        user['wants'] = []
-    if 'connections' not in user:
-        user['connections'] = []
-
-    matches = list(users_col.find({'username': {'$in': user['connections']}}))
+    matches = list(users_col.find({'username': {'$in': user.get('connections', [])}}))
 
     suggestions = []
-    other_users = list(users_col.find({'username': {'$ne': username, '$nin': user['connections']}}))
-    
-    for other_user in other_users:
+    user_embedding = user.get('embedding', [])
+    if user_embedding:
+        user_embedding = np.array(user_embedding)
+        other_users = list(users_col.find({
+            '$and': [
+                {'username': {'$ne': username}},
+                {'username': {'$nin': user.get('connections', [])}},
+                {'embedding': {'$exists': True}}
+            ]
+        }))
 
-        if 'offers' not in other_user:
-            other_user['offers'] = []
-        if 'wants' not in other_user:
-            other_user['wants'] = []
-        
+        for other_user in other_users:
+            other_embedding = np.array(other_user['embedding'])
+            similarity = cosine_similarity([user_embedding], [other_embedding])[0][0]
+            if similarity >= 0.5:
+                other_user['similarity'] = round(similarity * 100, 2)
+                suggestions.append(other_user)
 
-        if (set(user['offers']) & set(other_user['wants']) or 
-            set(user['wants']) & set(other_user['offers'])):
-            suggestions.append(other_user)
-    
+        suggestions.sort(key=lambda x: x['similarity'], reverse=True)
+
     return render_template('dashboard.html', user=user, matches=matches, suggestions=suggestions)
 
 @app.route('/profile')
@@ -225,44 +224,47 @@ def profile():
 
 @app.route('/select_skills', methods=['GET', 'POST'])
 def select_skills():
-    if 'username' not in session:
-        return redirect(url_for('login'))
-    
+    username = session['username']
+    user = users_col.find_one({'username': username})
+
     if request.method == 'POST':
-        username = session['username']
-        users_col.update_one(
-            {'username': username},
-            {'$set': {
-                'offers': request.form.getlist('offers'),
-                'wants': request.form.getlist('wants')
-            }}
-        )
-        return redirect(url_for('dashboard'))
-    
-    return render_template('select_skills.html')
+        bio = request.form.get('bio', '')
+        offers = request.form.getlist('offers')
+        wants = request.form.getlist('wants')
+        offers_text = ' '.join(offers)
+        wants_text = ' '.join(wants)
+        combined_text = offers_text + ' ' + wants_text
+        embedding = model.encode(combined_text).tolist()
+        users_col.update_one({'username': username}, {
+            '$set': {
+                'bio': bio,
+                'offers': offers,
+                'wants': wants,
+                'embedding': embedding
+            }
+        })
+        flash('Skills saved successfully!', 'success')
+        return redirect(url_for('dashboard'))  # or wherever you want to go after
+
+    return render_template('select_skills.html', user=user)
 
 @app.route('/matches')
 def matches():
     if 'username' not in session:
         return redirect(url_for('login'))
-    
     username = session['username']
     user = users_col.find_one({'username': username})
-    
     if not user:
         session.pop('username', None)
         flash('User not found. Please log in again.')
         return redirect(url_for('login'))
-    
     if 'connections' not in user:
         user['connections'] = []
-    
     connections = list(users_col.find({'username': {'$in': user['connections']}}))
-    
-
     user_match_percentages = {}
     user_offers = set(user.get('offers', []))
     user_wants = set(user.get('wants', []))
+
     for connection in connections:
         connection_offers = set(connection.get('offers', []))
         connection_wants = set(connection.get('wants', []))
@@ -285,58 +287,41 @@ def matches():
 def suggested():
     if 'username' not in session:
         return redirect(url_for('login'))
-    
+
     username = session['username']
     user = users_col.find_one({'username': username})
-    
+
     if not user:
         session.pop('username', None)
         flash('User not found. Please log in again.')
         return redirect(url_for('login'))
 
-    if 'offers' not in user:
-        user['offers'] = []
-    if 'wants' not in user:
-        user['wants'] = []
-    if 'connections' not in user:
-        user['connections'] = []
+    if 'embedding' not in user:
+        flash('Please set up your skills to get suggestions.')
+        return redirect(url_for('select_skills'))
 
-    print("Logged in as:", username)
-    print("Skills to teach (offers):", user['offers'])
-    print("Skills to learn (wants):", user['wants'])
-    print("Connections:", user['connections'])
+    user_embedding = np.array(user.get('embedding'))
+    user_connections = user.get('connections', [])
 
     other_users = list(users_col.find({
         '$and': [
             {'username': {'$ne': username}},
-            {'username': {'$nin': user['connections']}}
+            {'username': {'$nin': user_connections}},
+            {'embedding': {'$exists': True}}
         ]
     }))
-    
-    print("Found", len(other_users), "other users to compare.")
 
     suggestions = []
-
     for other_user in other_users:
-        if 'offers' not in other_user:
-            other_user['offers'] = []
-        if 'wants' not in other_user:
-            other_user['wants'] = []
-        
-        match_reasons = []
+        other_embedding = np.array(other_user['embedding'])
+        similarity = cosine_similarity([user_embedding], [other_embedding])[0][0]
 
-        teach_skills = set(user['offers']) & set(other_user['wants'])
-        if teach_skills:
-            match_reasons.append(f"You can teach them: {', '.join(teach_skills)}")
-
-        learn_skills = set(user['wants']) & set(other_user['offers'])
-        if learn_skills:
-            match_reasons.append(f"They can teach you: {', '.join(learn_skills)}")
-        
-        if match_reasons:
-            other_user['match_reasons'] = match_reasons
+        if similarity >= 0.5:  # You can adjust threshold
+            other_user['similarity'] = round(similarity * 100, 2)
             suggestions.append(other_user)
-    
+
+    suggestions.sort(key=lambda x: x['similarity'], reverse=True)
+
     return render_template('suggested.html', suggested_users=suggestions)
 
 
