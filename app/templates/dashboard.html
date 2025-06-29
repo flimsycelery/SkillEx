@@ -77,7 +77,10 @@
           {% if matches %}
           <ul>
             {% for match in matches %}
-              <li><strong>{{ match.username }}</strong> — offers: {{ match.offers | join(', ') }}</li>
+              <li><strong>{{ match.username }}</strong>
+                {% if match.similarity %}<span class="match-similarity">(Match: {{ match.similarity }}%)</span>{% endif %}
+                — offers: {{ match.offers | join(', ') }}
+              </li>
             {% endfor %}
           </ul>
           {% else %}
@@ -94,9 +97,9 @@
         <div>
           <h4>Suggested Matches</h4>
           <p>People you might want to connect with</p>
-          {% if suggestions %}
+          {% if suggested_users %}
           <ul class="ps-3">
-            {% for s in suggestions %}
+            {% for s in suggested_users %}
               <li>
                 <strong>{{ s.username }}</strong>
                 {% if s.similarity %}
@@ -118,5 +121,3 @@
   </div>
 </div>
 {% endblock %}
-
-
